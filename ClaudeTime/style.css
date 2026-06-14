@@ -1,0 +1,613 @@
+/* Claude Time styles */
+
+:root {
+  --road-pad: 32px;
+  --asphalt: #2b2f36;
+  --asphalt-edge: #1d2026;
+  --dash: #f4c542;
+  --line: #e8eaed;
+  --grass: #5aa83c;
+  --grass-dark: #4a8f31;
+  /* Icon size scales with window height: 96px on a tall window, down to ~48px
+     (half) on a short one, before scrollbars appear. */
+  --icon: clamp(48px, 16vh, 96px);
+  /* Vertical distance between the three icon lanes' centers. */
+  --lane-gap: var(--icon);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--asphalt-edge);
+  color: #1d2026;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+/* ---- floating settings gear (upper-right, over the road) ---- */
+#gear {
+  position: fixed;
+  top: 1px;            /* centered vertically in the 40px top grass strip */
+  right: 14px;
+  z-index: 20;
+  font-size: 20px;
+  line-height: 1;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 9px;
+  background: rgba(20, 22, 26, 0.55);
+  color: #f3f4f6;
+  cursor: pointer;
+}
+#gear:hover { background: rgba(40, 44, 50, 0.8); }
+
+/* ---- countdown timer (top strip, right-justified, just left of the gear) ---- */
+#countdown {
+  position: fixed;
+  top: 0;
+  right: 58px;            /* gear is right:14px + 38px wide; sit just to its left */
+  height: 40px;
+  display: flex;
+  align-items: center;     /* vertically centre in the 40px top strip */
+  font-size: 16px;         /* match the date line (#as-of) */
+  white-space: nowrap;
+  z-index: 20;
+  pointer-events: none;
+}
+#countdown[hidden] { display: none; }
+/* The fast, decorative "flying" hundredths — fixed width so it doesn't jitter. */
+#countdown .cd-flip {
+  display: inline-block;
+  width: 2ch;
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- grass strips that frame the road, top and bottom ---- */
+.grass {
+  flex: 0 0 40px;
+  height: 40px;
+  background: linear-gradient(var(--grass), var(--grass-dark));
+  display: flex;
+  align-items: center;       /* vertically centre any text in the strip */
+  padding: 0 16px;
+}
+.grass-top    { box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.18); justify-content: flex-start; position: relative; }
+.grass-bottom { box-shadow: inset 0  3px 0 rgba(0, 0, 0, 0.18); justify-content: flex-end; position: relative; }
+
+/* Solutions Harmony logo: left-anchored, vertically centred in the bottom strip.
+   Absolutely positioned so it doesn't disturb the right-justified GitHub link.
+   Height is the single knob to scale it — keep it within the 40px bar. */
+.bar-logo {
+  position: absolute;
+  left: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 32px;
+  width: auto;
+  pointer-events: none;
+}
+
+/* text sitting on the green strips (status line + GitHub link) */
+.grass-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: #123012;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+.grass-link { text-decoration: none; }
+.grass-link:hover { text-decoration: underline; }
+
+/* Status line (top strip): two sizes larger than the other grass text.
+   Date/time is left-justified (#as-of, in flow); "Token Monster" is centered
+   over the whole strip independently of the left text's width. */
+#as-of { font-size: 16px; }
+.grass-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 32px;          /* ~2x the other grass text */
+  line-height: 1;
+  color: #9ecbff;           /* light blue */
+  /* big, dark black drop shadow (layered for density) */
+  text-shadow: 4px 6px 16px rgba(0, 0, 0, 1), 2px 3px 8px rgba(0, 0, 0, 1);
+  pointer-events: none;
+}
+
+/* ---- road (fills the window between the grass strips) ---- */
+.road {
+  position: relative;
+  flex: 1 1 auto;
+  margin: 0;
+  min-height: 190px;
+  padding: 0 var(--road-pad);
+  background: linear-gradient(var(--asphalt), var(--asphalt));
+  background-color: var(--asphalt);
+  border-top: 6px solid var(--asphalt-edge);
+  border-bottom: 6px solid var(--asphalt-edge);
+}
+
+/* dashed centre line of the road */
+.road::after {
+  content: "";
+  position: absolute;
+  left: var(--road-pad);
+  right: var(--road-pad);
+  top: 50%;
+  height: 4px;
+  transform: translateY(-50%);
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--dash) 0,
+    var(--dash) 26px,
+    transparent 26px,
+    transparent 52px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* start / finish markers sit on the inner edges of the padding */
+.start-line,
+.finish-line {
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  width: 4px;
+  z-index: 1;
+}
+.start-line {
+  left: 3px;                /* hard against the left edge, clear of day letters */
+  background: var(--line);
+}
+.finish-line {
+  right: 3px;               /* hard against the right edge, clear of day letters */
+  background: repeating-linear-gradient(
+    45deg,
+    #fff 0,
+    #fff 6px,
+    #111 6px,
+    #111 12px
+  );
+}
+
+/* ---- day hash marks ---- */
+.hash {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  text-align: center;
+  z-index: 1;
+}
+.hash .tick {
+  width: 2px;
+  height: 26px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.55);
+}
+.hash .label {
+  margin-top: 4px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ---- icons (the moving objects — always above the road markings) ---- */
+/* Each icon's on-road size = base --icon * its per-object --obj-scale (set in JS
+   from the saved size, adjustable via the Size +/- buttons in Settings). */
+.icon {
+  position: absolute;
+  top: 50%;
+  --obj-scale: 1;
+  width: calc(var(--icon) * var(--obj-scale));
+  height: calc(var(--icon) * var(--obj-scale));
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 5;
+}
+.icon img {
+  width: calc(var(--icon) * var(--obj-scale));
+  height: calc(var(--icon) * var(--obj-scale));
+  object-fit: contain;
+}
+.icon .glyph {
+  font-size: calc(var(--icon) * var(--obj-scale) * 0.8);
+  line-height: calc(var(--icon) * var(--obj-scale));
+  text-align: center;
+  display: block;
+}
+/* Exception: the bed image (asleep Token Monster) is large and sits at the 100%
+   finish line, where centring would clip half of it off-screen. Pin it to the
+   right app edge (~3px) instead so the whole bed stays visible. */
+.icon.bed-edge {
+  left: auto !important;   /* beat the inline left set by placeIcon() */
+  right: 3px;
+  transform: translateY(-50%);
+}
+
+/* Three lanes clustered around the centre line (person centred, clock above,
+   car below) so coincident icons stay distinguishable without spreading.
+   Stacking, back-to-front, when icons overlap: road markings (z 1) < cookies
+   (clock) < token monster (person) < milk (car) < hover tooltips (z 200+). */
+#clock  { margin-top: calc(-1 * var(--lane-gap)); z-index: 5; }
+#person { margin-top: 0; z-index: 6; }
+#car    { margin-top: calc(var(--lane-gap) + 25px); z-index: 7; }
+/* Default per-object sizes (overridable live via the Size +/- buttons). */
+
+/* interactive icons accept clicks despite the base .icon rule */
+#clock, #person, #car { pointer-events: auto; cursor: pointer; }
+
+/* ---- click-to-inspect tooltip ---- */
+/* The owning icon gets .tip-open to lift its whole stacking context above the
+   other icons/road so the popout is never covered. */
+.icon.tip-open { z-index: 200; }
+/* Centered in the road (it's appended to .road, not the icon) so the popout is
+   always fully on-screen regardless of which icon — clock/person/car — was clicked. */
+.clock-tip {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #1b1e23;
+  color: #e8eaed;
+  border: 1px solid #3a3f48;
+  border-radius: 10px;
+  padding: 12px 18px;
+  font-size: 24px;        /* 2x the previous 12px */
+  line-height: 1.4;
+  white-space: nowrap;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+  z-index: 201;
+}
+
+/* ---- settings panel (side drawer) ---- */
+#settings-panel[hidden] { display: none; }
+#settings-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 660px;
+  max-width: calc(100vw - 16px);
+  background: #23272e;
+  color: #e8eaed;
+  border-left: 1px solid #3a3f48;
+  box-shadow: -12px 0 40px rgba(0, 0, 0, 0.5);
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
+}
+#settings-panel .settings-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  border-bottom: 1px solid #3a3f48;
+}
+#settings-panel .settings-head h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+#settings-close {
+  font-size: 22px;
+  line-height: 1;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #3a3f48;
+  border-radius: 8px;
+  background: #2f343c;
+  color: #e8eaed;
+  cursor: pointer;
+}
+#settings-close:hover { filter: brightness(1.12); }
+
+#settings-panel .settings-body {
+  padding: 16px 18px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  text-align: left;
+  gap: 16px;
+}
+/* Keep each control at its natural height and let the body SCROLL when the popup
+   is short — otherwise flex-shrink crushes an expanded <details> to a sliver. */
+#settings-panel .settings-body > * { flex-shrink: 0; }
+#settings-panel .field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+}
+/* The [hidden] attribute must win over .field's display:flex (e.g. the DST
+   offset field, which app.js toggles via .hidden). */
+#settings-panel .field[hidden] { display: none; }
+#settings-panel .field > span { color: #b9bdc6; }
+#settings-panel .field-inline {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+#settings-panel .field-inline > span { color: #e8eaed; }
+
+#settings-panel select,
+#settings-panel input[type="number"] {
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #3a3f48;
+  background: #1b1e23;
+  color: #e8eaed;
+  font-size: 14px;
+}
+#settings-panel .time-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+#settings-panel .time-row input { width: 72px; }
+#settings-panel .time-sep { color: #b9bdc6; }
+
+#settings-panel input[type="file"] {
+  font-size: 12px;
+  color: #e8eaed;
+}
+
+/* ---- per-object art sections ---- */
+#settings-panel .art-obj {
+  border: 1px solid #3a3f48;
+  border-radius: 8px;
+  background: #1f232a;
+  padding: 0;
+  overflow: hidden;
+}
+#settings-panel .art-obj > summary {
+  cursor: pointer;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #e8eaed;
+  list-style: none;
+  user-select: none;
+}
+#settings-panel .art-obj > summary::-webkit-details-marker { display: none; }
+/* Toolbar (app window) size row — looks like a section header but doesn't expand;
+   the framed-picture icon is purely decorative, the +/- scale the whole popup. */
+#settings-panel .toolbar-row {
+  display: flex;
+  align-items: center;
+  border: 1px solid #3a3f48;
+  border-radius: 8px;
+  background: #1f232a;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #e8eaed;
+}
+/* Countdown + 24h controls, pushed to the right of the same row. */
+#settings-panel .toolbar-row .toolbar-extra {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-weight: 400;
+}
+#settings-panel .toolbar-row .tb-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #b9bdc6;
+  cursor: pointer;
+  white-space: nowrap;
+}
+#settings-panel .toolbar-row .tb-field select { font-size: 13px; padding: 5px 6px; }
+
+/* Disclosure marker: a little "framed picture" icon (frame + sun + mountains)
+   instead of a rotating arrow, for all three art sections (and the Toolbar row). */
+#settings-panel .art-obj > summary::before,
+#settings-panel .toolbar-row::before {
+  content: "";
+  display: inline-block;
+  flex: 0 0 auto;          /* never shrink when the Toolbar row is a tight flexbox */
+  width: 18px;
+  height: 16px;
+  margin-right: 9px;
+  vertical-align: -3px;
+  background: center / contain no-repeat
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 22' fill='none' stroke='%23c3c8d0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='2' y='3' width='20' height='16' rx='2.5'/><circle cx='8' cy='8.5' r='1.7' fill='%23c3c8d0' stroke='none'/><path d='M3 17l5-5 3.5 3.5L16 9l5 5.5'/></svg>");
+}
+#settings-panel .art-obj[open] > summary::before { opacity: 0.85; }
+#settings-panel .art-obj > summary:hover { background: #262b33; }
+
+/* "[ - ] Size [ + ]" on-road-size stepper, 20px right of the section title. */
+#settings-panel .size-ctl {
+  margin-left: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  vertical-align: middle;
+  font-weight: 400;
+}
+#settings-panel .size-label { font-size: 12px; color: #b9bdc6; }
+#settings-panel .size-btn {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  border-radius: 6px;
+  border: 1px solid #6cb2ef;
+  background: #9ecbff;   /* light blue */
+  color: #10243a;
+  cursor: pointer;
+}
+#settings-panel .size-btn:hover { filter: brightness(1.08); }
+#settings-panel .art-obj .art-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border-top: 1px solid #3a3f48;
+  font-size: 13px;
+}
+#settings-panel .art-obj .art-mode-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+#settings-panel .art-obj .art-mode-row > span { color: #b9bdc6; font-size: 12px; }
+#settings-panel .art-uploader[hidden] { display: none; }
+#settings-panel .art-uploader {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ---- ordered thumbnail strip (series) ---- */
+#settings-panel .frame-thumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 168px;
+  overflow-y: auto;
+}
+#settings-panel .frame-thumb {
+  position: relative;
+  width: 48px;
+  height: 48px;
+}
+#settings-panel .frame-thumb img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border: 1px solid #3a3f48;
+  border-radius: 6px;
+  background: #15181d;
+  cursor: grab;
+  display: block;
+}
+#settings-panel .frame-thumb.dragging { opacity: 0.4; }
+#settings-panel .frame-thumb .thumb-x {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 18px;
+  height: 18px;
+  line-height: 16px;
+  text-align: center;
+  font-size: 13px;
+  border-radius: 50%;
+  border: 1px solid #3a3f48;
+  background: #2f343c;
+  color: #e8eaed;
+  cursor: pointer;
+  padding: 0;
+}
+#settings-panel .frame-thumb .thumb-x:hover { filter: brightness(1.2); }
+#settings-panel .art-note { color: #b9bdc6; font-size: 12px; min-height: 14px; }
+#settings-panel .art-status { color: #f4c542; font-size: 12px; min-height: 14px; }
+#settings-panel .art-obj .reset-btn { align-self: flex-start; margin-top: 2px; }
+
+#settings-panel .reset-btn {
+  margin-top: 4px;
+  padding: 10px 14px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #3a3f48;
+  background: #2f343c;
+  color: #e8eaed;
+  cursor: pointer;
+}
+#settings-panel .reset-btn:hover { filter: brightness(1.12); }
+
+#settings-panel .test-btn {
+  margin-top: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  border-radius: 8px;
+  border: 1px solid #5a6b3a;
+  background: #3a4a2a;
+  color: #e8f0dd;
+  cursor: pointer;
+}
+#settings-panel .test-btn:hover { filter: brightness(1.15); }
+
+/* Global actions row: Test cycle + Reset on the left, Help link on the right. */
+#settings-panel .settings-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+#settings-panel .actions-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+#settings-panel .settings-actions .test-btn,
+#settings-panel .settings-actions .reset-btn { margin-top: 0; }
+#settings-panel .help-link {
+  color: #8ab4f8;
+  text-decoration: none;
+  font-size: 14px;
+  padding: 8px 4px;
+  white-space: nowrap;
+}
+#settings-panel .help-link:hover { text-decoration: underline; }
+#settings-panel .disclaimer {
+  margin: 10px 0 0;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #8a8a8a;
+  text-align: center;
+}
+
+/* ---- popup-specific sizing ---- */
+/* In the browser-action popup the body is a fixed-width box (not full screen),
+   so override the full-height flex layout used by the standalone page. */
+body.popup {
+  width: 720px;
+  /* Hug the content height (override the html,body height:100% used by the
+     standalone page) so the popup ends just past the bottom green bar instead of
+     leaving a tall black gap. The 3px padding shows a sliver of background below. */
+  height: auto;
+  min-height: 0;
+  padding-bottom: 3px;
+  display: block;
+}
+/* When Settings is open the popup grows to fit the panel's content height (set in
+   JS via sizeSettings()), capped by the browser's popup max; the panel body then
+   scrolls if it's still taller. No fixed height — only as tall as needed. */
+body.popup #road-wrap[hidden],
+body.popup #signed-out[hidden] { display: none; }
+
+/* Popup road: a compact band (~half the previous height). */
+body.popup .road { min-height: 220px; }
+
+/* Signed-out / no-data message. */
+#signed-out {
+  padding: 28px 22px;
+  color: #e8eaed;
+  background: var(--asphalt-edge);
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+}
+#signed-out a { color: var(--dash); }

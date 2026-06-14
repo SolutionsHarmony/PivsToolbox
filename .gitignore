@@ -1,0 +1,14 @@
+# Claude Code stores per-machine permission approvals here and auto-appends
+# one-off command rules during sessions, which creates noisy churn. Ignore it by
+# default. The canonical workflow permissions are documented in CLAUDE.md and are
+# regenerated for any repo by scripts/Apply-GitWorkflow.ps1, so this file does not
+# need to be tracked.
+#
+# This repo (the tooling source) can still capture a deliberate snapshot when you
+# explicitly want one:
+#     git add -f .claude/settings.local.json
+.claude/settings.local.json
+.claude/settings.json
+
+# Built binaries are distributed via GitHub Releases, not committed to the repo.
+*.exe

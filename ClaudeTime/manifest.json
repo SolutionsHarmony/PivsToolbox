@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Token Monster — Claude usage tracker",
+  "version": "2.1.0",
+  "description": "Track your real Claude 5-hour and weekly usage at a glance from your toolbar.",
+  "permissions": ["storage", "alarms", "unlimitedStorage"],
+  "host_permissions": ["https://claude.ai/*"],
+  "background": { "service_worker": "background.js" },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Token Monster",
+    "default_icon": {
+      "16": "assets/icon-16.png",
+      "48": "assets/icon-48.png",
+      "128": "assets/icon-128.png"
+    }
+  },
+  "icons": {
+    "16": "assets/icon-16.png",
+    "48": "assets/icon-48.png",
+    "128": "assets/icon-128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://claude.ai/*"],
+      "js": ["usage-client.js", "usage-fetch.js", "content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Token Monster</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="popup">
+  <button id="gear" aria-label="Settings">⚙</button>
+
+  <!-- Signed-out / no-data state (hidden until needed) -->
+  <div id="signed-out" hidden>
+    <p>Open <a href="https://claude.ai" target="_blank" rel="noopener">claude.ai</a> and sign in to see your usage.</p>
+  </div>
+
+  <!-- The road race (hidden until we have data) -->
+  <div id="road-wrap">
+    <div class="grass grass-top">
+      <span id="as-of" class="grass-text"></span>
+      <span id="token-monster" class="grass-text grass-center">Token Monster</span>
+      <span id="countdown" class="grass-text" aria-hidden="true"></span>
+    </div>
+    <main class="road">
+      <div class="start-line"></div>
+      <div class="finish-line"></div>
+      <!-- 7 .hash day-marks injected here by popup.js -->
+      <div id="clock" class="icon"></div>
+      <div id="person" class="icon"></div>
+      <div id="car" class="icon"></div>
+    </main>
+    <div class="grass grass-bottom">
+      <img class="bar-logo" src="assets/SolutionsHarmonyLogo_bar.png" alt="Solutions Harmony">
+      <a class="grass-text grass-link"
+         href="https://github.com/SolutionsHarmony/PivsToolbox"
+         target="_blank" rel="noopener">Find more @ https://github.com/SolutionsHarmony/PivsToolbox</a>
+    </div>
+  </div>
+
+  <aside id="settings-panel" hidden aria-label="Settings">
+    <div class="settings-head">
+      <h2>Settings</h2>
+      <button type="button" id="settings-close" aria-label="Close settings">×</button>
+    </div>
+
+    <div class="settings-body">
+      <div class="toolbar-row">
+        <span class="art-title">Toolbar</span>
+        <span class="size-ctl">
+          <button type="button" class="size-btn" data-toolbar="-1" aria-label="Smaller toolbar">−</button>
+          <span class="size-label">Size</span>
+          <button type="button" class="size-btn" data-toolbar="1" aria-label="Larger toolbar">+</button>
+        </span>
+        <span class="toolbar-extra">
+          <label class="tb-field">
+            <span>Countdown</span>
+            <select id="set-countdown">
+              <option value="5h">🥛 5-Hour</option>
+              <option value="weekly">🏁 Weekly</option>
+              <option value="both">🔁 Both (rotate 10s)</option>
+              <option value="none">🚫 None (hide)</option>
+            </select>
+          </label>
+          <label class="tb-field" title="24-hour clock (off = AM/PM)">
+            <input id="set-24h" type="checkbox">
+            <span>24h</span>
+          </label>
+        </span>
+      </div>
+
+      <details class="art-obj">
+        <summary><span class="art-title">Weekly Tokens</span><span class="size-ctl"><button type="button" class="size-btn" data-obj="clock" data-dir="-1" aria-label="Smaller">−</button><span class="size-label">Size</span><button type="button" class="size-btn" data-obj="clock" data-dir="1" aria-label="Larger">+</button></span></summary>
+        <div class="art-body">
+          <label class="art-mode-row">
+            <span>Art mode</span>
+            <select id="mode-clock">
+              <option value="default">Default</option>
+              <option value="series">Image series</option>
+              <option value="video">Video</option>
+            </select>
+          </label>
+          <div class="art-uploader art-series" id="series-wrap-clock" hidden>
+            <input id="series-clock" type="file" accept="image/*" multiple>
+            <div class="frame-thumbs" id="thumbs-clock"></div>
+            <span class="art-status" id="status-art-clock"></span>
+          </div>
+          <div class="art-uploader art-video" id="video-wrap-clock" hidden>
+            <input id="video-clock" type="file" accept="video/*">
+            <span class="art-note" id="note-clock"></span>
+          </div>
+          <button type="button" id="clear-clock" class="reset-btn">Clear</button>
+        </div>
+      </details>
+
+      <details class="art-obj">
+        <summary><span class="art-title">Token Monster Eating</span><span class="size-ctl"><button type="button" class="size-btn" data-obj="person" data-dir="-1" aria-label="Smaller">−</button><span class="size-label">Size</span><button type="button" class="size-btn" data-obj="person" data-dir="1" aria-label="Larger">+</button></span></summary>
+        <div class="art-body">
+          <label class="art-mode-row">
+            <span>Art mode</span>
+            <select id="mode-person">
+              <option value="default">Default</option>
+              <option value="series">Image series</option>
+              <option value="video">Video</option>
+            </select>
+          </label>
+          <div class="art-uploader art-series" id="series-wrap-person" hidden>
+            <input id="series-person" type="file" accept="image/*" multiple>
+            <div class="frame-thumbs" id="thumbs-person"></div>
+            <span class="art-status" id="status-art-person"></span>
+          </div>
+          <div class="art-uploader art-video" id="video-wrap-person" hidden>
+            <input id="video-person" type="file" accept="video/*">
+            <span class="art-note" id="note-person"></span>
+          </div>
+          <button type="button" id="clear-person" class="reset-btn">Clear</button>
+        </div>
+      </details>
+
+      <details class="art-obj">
+        <summary><span class="art-title">Milk Needed To Eat</span><span class="size-ctl"><button type="button" class="size-btn" data-obj="car" data-dir="-1" aria-label="Smaller">−</button><span class="size-label">Size</span><button type="button" class="size-btn" data-obj="car" data-dir="1" aria-label="Larger">+</button></span></summary>
+        <div class="art-body">
+          <label class="art-mode-row">
+            <span>Art mode</span>
+            <select id="mode-car">
+              <option value="default">Default</option>
+              <option value="series">Image series</option>
+              <option value="video">Video</option>
+            </select>
+          </label>
+          <div class="art-uploader art-series" id="series-wrap-car" hidden>
+            <input id="series-car" type="file" accept="image/*" multiple>
+            <div class="frame-thumbs" id="thumbs-car"></div>
+            <span class="art-status" id="status-art-car"></span>
+          </div>
+          <div class="art-uploader art-video" id="video-wrap-car" hidden>
+            <input id="video-car" type="file" accept="video/*">
+            <span class="art-note" id="note-car"></span>
+          </div>
+          <button type="button" id="clear-car" class="reset-btn">Clear</button>
+        </div>
+      </details>
+
+      <div class="settings-actions">
+        <div class="actions-left">
+          <button type="button" id="set-test" class="test-btn">Test cycle</button>
+          <button type="button" id="set-reset" class="reset-btn">Reset to defaults</button>
+        </div>
+        <a class="help-link"
+           href="https://github.com/SolutionsHarmony/PivsToolbox/blob/main/ClaudeTime/README.md"
+           target="_blank" rel="noopener">Help</a>
+      </div>
+
+      <p class="disclaimer">Not affiliated with or endorsed by Anthropic.</p>
+    </div>
+  </aside>
+
+  <script src="time-math.js"></script>
+  <script src="art-math.js"></script>
+  <script src="art-store.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
