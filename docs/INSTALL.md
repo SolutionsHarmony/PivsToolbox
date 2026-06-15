@@ -10,8 +10,8 @@ There are two ways to install it. Pick one.
 
 ## Option A — Install with the EXE (easiest, no git needed)
 
-1. Get **`AppCardTool-Setup.exe`** (from `installer/AppCardTool-Setup.exe` in this
-   repo, or wherever you saved it).
+1. Download **`AppCardTool-Setup.exe`** from the
+   [latest release](https://github.com/SolutionsHarmony/PivsToolbox/releases/latest).
 2. Double-click it.
    - Windows SmartScreen may warn because the EXE is unsigned — click
      **More info → Run anyway**.
@@ -64,7 +64,7 @@ Paste this into a terminal. It downloads the pinned release, installs the skill
 to `~/.claude/skills/appcard`, and prints a confirmation. No git checkout needed.
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/SolutionsHarmony/PivsToolbox/v1.1.1/scripts/install-appcard-mac.sh | sh
+curl -fsSL https://raw.githubusercontent.com/SolutionsHarmony/PivsToolbox/appcard-v1.1.2/scripts/install-appcard-mac.sh | sh
 ```
 
 Re-run the same line any time to update or repair the install.
@@ -73,10 +73,10 @@ Re-run the same line any time to update or repair the install.
 
 ```sh
 # install a specific release tag
-APPCARD_VERSION=v1.1.1 curl -fsSL https://raw.githubusercontent.com/SolutionsHarmony/PivsToolbox/v1.1.1/scripts/install-appcard-mac.sh | sh
+APPCARD_VERSION=appcard-v1.1.2 curl -fsSL https://raw.githubusercontent.com/SolutionsHarmony/PivsToolbox/appcard-v1.1.2/scripts/install-appcard-mac.sh | sh
 
 # install into a different skills root
-CLAUDE_SKILLS_DIR="$HOME/somewhere/.claude/skills" curl -fsSL https://raw.githubusercontent.com/SolutionsHarmony/PivsToolbox/v1.1.1/scripts/install-appcard-mac.sh | sh
+CLAUDE_SKILLS_DIR="$HOME/somewhere/.claude/skills" curl -fsSL https://raw.githubusercontent.com/SolutionsHarmony/PivsToolbox/appcard-v1.1.2/scripts/install-appcard-mac.sh | sh
 ```
 
 Requires `curl` and `tar` (both ship with macOS). **Uninstall:**
@@ -166,7 +166,9 @@ Restore a card from a backup by copying a timestamped file back over `docs/appca
 
 ## Updating the tool later
 
-- **EXE:** run a newer `AppCardTool-Setup.exe` (it mirrors the latest skill into place).
+- **EXE:** download a newer `AppCardTool-Setup.exe` from
+  [Releases](https://github.com/SolutionsHarmony/PivsToolbox/releases) and run it
+  (it mirrors the latest skill into place).
 - **Script (Windows):** `git pull` in the checkout, then `pwsh scripts/Install-AppCardSkill.ps1` again.
 - **macOS / Linux:** re-run the Option C one-liner (bump the `v…` tag for a newer release).
 

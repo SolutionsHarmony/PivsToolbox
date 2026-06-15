@@ -1,16 +1,17 @@
 #!/bin/sh
-# install-appcard-mac.sh — install the appcard Claude Code skill on macOS/Linux.
+# install-appcard-mac.sh — v1.1.2
+# Install the appcard Claude Code skill on macOS/Linux.
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/SolutionsHarmony/PivsToolbox/v1.1.1/scripts/install-appcard-mac.sh | sh
+#   curl -fsSL https://raw.githubusercontent.com/SolutionsHarmony/PivsToolbox/appcard-v1.1.2/scripts/install-appcard-mac.sh | sh
 #
 # Overrides (env):
-#   APPCARD_VERSION    release tag to install (default: v1.1.0)
+#   APPCARD_VERSION    release tag to install (default: appcard-v1.1.2)
 #   CLAUDE_SKILLS_DIR  skills root            (default: $HOME/.claude/skills)
 set -eu
 
 REPO="SolutionsHarmony/PivsToolbox"
-TAG="${APPCARD_VERSION:-v1.1.1}"
+TAG="${APPCARD_VERSION:-appcard-v1.1.2}"
 SKILLS_DIR="${CLAUDE_SKILLS_DIR:-$HOME/.claude/skills}"
 DEST="$SKILLS_DIR/appcard"
 

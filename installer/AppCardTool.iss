@@ -12,8 +12,8 @@
 ; Silent:  AppCardTool-Setup.exe /VERYSILENT   (installs to %USERPROFILE%\.claude, no prompts)
 
 #define MyAppName "App Card Tool"
-#define MyAppVersion "1.1.1"
-#define MyAppPublisher "Bryan Pivik"
+#define MyAppVersion "1.1.2"
+#define MyAppPublisher "Solutions Harmony Inc."
 
 [Setup]
 AppId={{8F2C1A4E-3B5D-4C6F-9A1E-7D2B8C3F0A12}
